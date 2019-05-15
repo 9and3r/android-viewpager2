@@ -17,12 +17,9 @@
 package androidx.viewpager2.integration.testapp
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.Spinner
-import android.widget.SpinnerAdapter
+import android.widget.*
 import androidx.fragment.app.FragmentActivity
+import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.integration.testapp.cards.Card
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
@@ -41,6 +38,7 @@ abstract class BaseCardActivity : FragmentActivity() {
     private lateinit var translateCheckBox: CheckBox
     private lateinit var scaleCheckBox: CheckBox
     private lateinit var gotoPage: Button
+    private lateinit var textViewPageNumber: TextView
 
     private val translateX get() = viewPager.orientation == ORIENTATION_VERTICAL &&
             translateCheckBox.isChecked
@@ -77,6 +75,7 @@ abstract class BaseCardActivity : FragmentActivity() {
         translateCheckBox = findViewById(R.id.translate_checkbox)
         scaleCheckBox = findViewById(R.id.scale_checkbox)
         gotoPage = findViewById(R.id.jump_button)
+        textViewPageNumber = findViewById(R.id.page_number_text_view)
 
         UserInputController(viewPager, findViewById(R.id.disable_user_input_checkbox)).setup()
         OrientationController(viewPager, findViewById(R.id.orientation_spinner)).setup()
@@ -88,6 +87,14 @@ abstract class BaseCardActivity : FragmentActivity() {
             val card = cardSelector.selectedItemPosition
             val smoothScroll = smoothScrollCheckBox.isChecked
             viewPager.setCurrentItem(card, smoothScroll)
+        }
+
+        viewPager.run {
+            registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    textViewPageNumber.setText("Current page: " + position)
+                }
+            })
         }
 
         rotateCheckBox.setOnClickListener { viewPager.requestTransform() }
